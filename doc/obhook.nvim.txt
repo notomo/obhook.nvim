@@ -1,0 +1,86 @@
+*obhook.nvim.txt*
+
+==============================================================================
+Lua module: obhook                                        *obhook.nvim-obhook*
+
+new({target}, {opts})                                           *obhook.new()*
+  Returns hookable table to replace with target.
+
+  Parameters: ~
+    {target} (table|function) target to hook on before/after access
+    {opts} (ObhookNewOption?) |ObhookNewOption|
+
+  Return: ~
+    (table) hookable table
+
+string_newindex({ctx}, {tbl}, {key}, {value})       *obhook.string_newindex()*
+  Returns newindex string expression.
+
+  Parameters: ~
+    {ctx} (ObhookContext) |ObhookContext|
+    {tbl} (table) pass |ObhookHooks|.before_newindex or |ObhookHooks|.after_newindex 'tbl' argument
+    {key} (any) pass |ObhookHooks|.before_newindex or |ObhookHooks|.after_newindex 'key' argument
+    {value} (any) pass |ObhookHooks|.before_newindex or |ObhookHooks|.after_newindex 'value' argument
+
+  Return: ~
+    (string) "tbl[key] = value"
+
+string_call({ctx}, {f}, {args})                         *obhook.string_call()*
+  Returns call string expression.
+
+  Parameters: ~
+    {ctx} (ObhookContext) |ObhookContext|
+    {f} (function) pass |ObhookHooks|.before_call or |ObhookHooks|.after_call 'f' argument
+    {args} (table) pass |ObhookHooks|.before_call or |ObhookHooks|.after_call 'args' argument
+
+  Return: ~
+    (string) "keys.f(args)"
+
+==============================================================================
+STRUCTURE                                              *obhook.nvim-STRUCTURE*
+
+ObhookNewOption                                              *ObhookNewOption*
+
+- {parent_keys} (any[]?) |ObhookContext|.keys initial value
+- {hooks} (ObhookHooks?) |ObhookHooks|
+
+ObhookContext                                                  *ObhookContext*
+
+- {keys} (any[]) accessed table keys
+
+ObhookHooks                                                      *ObhookHooks*
+
+- {before_index} (fun(ctx:ObhookContext,tbl:table,key:any)?) called on before table access
+- {after_index} (fun(ctx:ObhookContext,tbl:table,key:any,value:any)?) called on after table access
+- {before_call} (fun(ctx:ObhookContext,f:function,args:table)?) called on before function call
+- {after_call} (fun(ctx:ObhookContext,f:function,args:table,result:table)?) called on after function call
+- {before_newindex} (fun(ctx:ObhookContext,tbl:table,key:any,value:any)?) called on before table assignment
+- {after_newindex} (fun(ctx:ObhookContext,tbl:table,key:any,value:any)?) called on after table assignment
+
+==============================================================================
+EXAMPLES                                                *obhook.nvim-EXAMPLES*
+
+>
+  local obhook = require("obhook")
+  local hooked_vim = obhook.new(vim, {
+    hooks = {
+      before_newindex = function(ctx, tbl, k, v)
+        local str = obhook.string_newindex(ctx, tbl, k, v)
+        vim.print(str) -- vim.opt.wrap = false
+      end,
+      before_call = function(ctx, f, args)
+        local str = obhook.string_call(ctx, f, args)
+        vim.print(str) -- vim.api.nvim_create_buf(false, true)
+      end,
+    },
+    parent_keys = { "vim" },
+  })
+
+  local vim = hooked_vim
+  vim.opt.wrap = false
+  vim.api.nvim_create_buf(false, true)
+
+<
+
+==============================================================================
+vim:tw=78:ts=8:ft=help
