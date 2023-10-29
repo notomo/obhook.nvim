@@ -186,3 +186,64 @@ describe("obhook.new()", function()
     assert.is_same({ keys = { "key", "f" } }, used_ctx)
   end)
 end)
+
+describe("obhook.string_newindex()", function()
+  before_each(helper.before_each)
+  after_each(helper.after_each)
+
+  it("makes newindex as string expression", function()
+    local got
+
+    local hooked = obhook.new({ key1 = { key2 = "value1" } }, {
+      hooks = {
+        before_newindex = function(...)
+          got = obhook.string_newindex(...)
+        end,
+      },
+      parent_keys = { "hooked" },
+    })
+
+    hooked.key1.key2 = "value2"
+
+    assert.is_same([[hooked["key1"]["key2"] = "value2"]], got)
+  end)
+
+  it("can use number as index", function()
+    local got
+
+    local hooked = obhook.new({ [8888] = "value1" }, {
+      hooks = {
+        before_newindex = function(...)
+          got = obhook.string_newindex(...)
+        end,
+      },
+      parent_keys = { "hooked" },
+    })
+
+    hooked[8888] = "value2"
+
+    assert.is_same([[hooked[8888] = "value2"]], got)
+  end)
+end)
+
+describe("obhook.string_call()", function()
+  before_each(helper.before_each)
+  after_each(helper.after_each)
+
+  it("makes call as string expression", function()
+    local got
+
+    local hooked = obhook.new({ key1 = { key2 = function() end } }, {
+      hooks = {
+        before_call = function(...)
+          got = obhook.string_call(...)
+        end,
+      },
+      parent_keys = { "hooked" },
+    })
+
+    hooked.key1.key2(1, "2", { key = 3 })
+
+    assert.is_same([[hooked["key1"]["key2"](1, "2", { key = 3 })]], got)
+  end)
+end)

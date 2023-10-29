@@ -2,14 +2,26 @@ local M = {}
 
 local vim = vim
 
+local from_keys = function(keys)
+  local head = keys[1]
+  local rest = vim
+    .iter(keys)
+    :skip(1)
+    :map(function(key)
+      return ("[%s]"):format(vim.inspect(key))
+    end)
+    :totable()
+  return head .. table.concat(rest, "")
+end
+
 function M.from_newindex(ctx, _, _, v)
-  local left = table.concat(ctx.keys, ".")
+  local left = from_keys(ctx.keys)
   local right = vim.inspect(v, { newline = " ", indent = "" })
   return left .. " = " .. right
 end
 
 function M.from_call(ctx, _, packed_args)
-  local function_name = table.concat(ctx.keys, ".")
+  local function_name = from_keys(ctx.keys)
 
   local args_str = vim.inspect({ vim.F.unpack_len(packed_args) }, { newline = " ", indent = "" })
   if vim.startswith(args_str, "{") then
