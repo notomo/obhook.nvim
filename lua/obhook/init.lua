@@ -1,7 +1,7 @@
 local M = {}
 
 --- @class ObhookNewOption
---- @field parent_keys any[]? |ObhookContext|.keys initial value
+--- @field parent_key string? |ObhookContext|.keys the first value (default: "obhook_root")
 --- @field hooks ObhookHooks? |ObhookHooks|
 
 --- @class ObhookContext

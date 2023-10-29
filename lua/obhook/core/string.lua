@@ -3,7 +3,7 @@ local M = {}
 local vim = vim
 
 local from_keys = function(keys)
-  local head = keys[1]
+  local head = keys[1] or ""
   local rest = vim
     .iter(keys)
     :skip(1)

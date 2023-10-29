@@ -12,7 +12,7 @@ local default_opts = {
     after_call = function(_, _) end,
   },
 
-  parent_keys = {},
+  parent_key = "obhook_root",
 }
 function M.new(raw_opts)
   vim.validate({ raw_opts = { raw_opts, "table", true } })

@@ -41,7 +41,7 @@ STRUCTURE                                              *obhook.nvim-STRUCTURE*
 
 ObhookNewOption                                              *ObhookNewOption*
 
-- {parent_keys} (any[]?) |ObhookContext|.keys initial value
+- {parent_key} (string?) |ObhookContext|.keys the first value (default: "obhook_root")
 - {hooks} (ObhookHooks?) |ObhookHooks|
 
 ObhookContext                                                  *ObhookContext*

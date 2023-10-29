@@ -4,7 +4,7 @@ local vim = vim
 
 function M.new(target, raw_opts)
   local opts = require("obhook.core.option").new(raw_opts)
-  local ctx = require("obhook.core.context").new(opts.parent_keys)
+  local ctx = require("obhook.core.context").new({ opts.parent_key })
   return M._new(ctx, target, opts)
 end
 

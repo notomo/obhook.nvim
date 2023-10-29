@@ -9,14 +9,12 @@ describe("obhook.new()", function()
     local called = 0
     local before = 0
     local after = 0
-    local used_ctx
 
     local hooked = obhook.new({ key = "value" }, {
       hooks = {
-        before_index = function(ctx)
+        before_index = function()
           called = called + 1
           before = called
-          used_ctx = ctx
         end,
         after_index = function()
           called = called + 1
@@ -30,7 +28,6 @@ describe("obhook.new()", function()
     assert.is_same(before, 1)
     assert.is_same(after, 2)
     assert.is_same("value", got)
-    assert.is_same({ keys = { "key" } }, used_ctx)
   end)
 
   it("can hook nested index", function()
@@ -51,6 +48,7 @@ describe("obhook.new()", function()
           after = called
         end,
       },
+      parent_key = "hooked",
     })
 
     local got = hooked.key1.key2
@@ -58,14 +56,13 @@ describe("obhook.new()", function()
     assert.is_same(before, 3)
     assert.is_same(after, 4)
     assert.is_same("value", got)
-    assert.is_same({ keys = { "key1", "key2" } }, used_ctx)
+    assert.is_same({ keys = { "hooked", "key1", "key2" } }, used_ctx)
   end)
 
   it("can hook newindex simply", function()
     local called = 0
     local before = 0
     local after = 0
-    local used_ctx
 
     local target = { key = "value1" }
     local hooked = obhook.new(target, {
@@ -73,7 +70,6 @@ describe("obhook.new()", function()
         before_newindex = function(ctx)
           called = called + 1
           before = called
-          used_ctx = ctx
         end,
         after_newindex = function()
           called = called + 1
@@ -87,22 +83,19 @@ describe("obhook.new()", function()
     assert.is_same(before, 1)
     assert.is_same(after, 2)
     assert.is_same("value2", target.key)
-    assert.is_same({ keys = { "key" } }, used_ctx)
   end)
 
   it("can hook newindex in nested index", function()
     local called = 0
     local before = 0
     local after = 0
-    local used_ctx
 
     local target = { key1 = { key2 = "value1" } }
     local hooked = obhook.new(target, {
       hooks = {
-        before_newindex = function(ctx)
+        before_newindex = function()
           called = called + 1
           before = called
-          used_ctx = ctx
         end,
         after_newindex = function()
           called = called + 1
@@ -116,24 +109,21 @@ describe("obhook.new()", function()
     assert.is_same(before, 1)
     assert.is_same(after, 2)
     assert.is_same("value2", target.key1.key2)
-    assert.is_same({ keys = { "key1", "key2" } }, used_ctx)
   end)
 
   it("can hook call simply", function()
     local called = 0
     local before = 0
     local after = 0
-    local used_ctx
 
     local f = function(a)
       return "value1", a
     end
     local hooked = obhook.new(f, {
       hooks = {
-        before_call = function(ctx)
+        before_call = function()
           called = called + 1
           before = called
-          used_ctx = ctx
         end,
         after_call = function()
           called = called + 1
@@ -148,14 +138,12 @@ describe("obhook.new()", function()
     assert.is_same(after, 2)
     assert.is_same("value1", got1)
     assert.is_same("value2", got2)
-    assert.is_same({ keys = {} }, used_ctx)
   end)
 
   it("can hook call in nested index", function()
     local called = 0
     local before = 0
     local after = 0
-    local used_ctx
 
     local target = {
       key = {
@@ -166,10 +154,9 @@ describe("obhook.new()", function()
     }
     local hooked = obhook.new(target, {
       hooks = {
-        before_call = function(ctx)
+        before_call = function()
           called = called + 1
           before = called
-          used_ctx = ctx
         end,
         after_call = function()
           called = called + 1
@@ -183,7 +170,6 @@ describe("obhook.new()", function()
     assert.is_same(before, 1)
     assert.is_same(after, 2)
     assert.is_same("value1", got)
-    assert.is_same({ keys = { "key", "f" } }, used_ctx)
   end)
 end)
 
@@ -200,7 +186,7 @@ describe("obhook.string_newindex()", function()
           got = obhook.string_newindex(...)
         end,
       },
-      parent_keys = { "hooked" },
+      parent_key = "hooked",
     })
 
     hooked.key1.key2 = "value2"
@@ -217,7 +203,7 @@ describe("obhook.string_newindex()", function()
           got = obhook.string_newindex(...)
         end,
       },
-      parent_keys = { "hooked" },
+      parent_key = "hooked",
     })
 
     hooked[8888] = "value2"
@@ -239,7 +225,7 @@ describe("obhook.string_call()", function()
           got = obhook.string_call(...)
         end,
       },
-      parent_keys = { "hooked" },
+      parent_key = "hooked",
     })
 
     hooked.key1.key2(1, "2", { key = 3 })
