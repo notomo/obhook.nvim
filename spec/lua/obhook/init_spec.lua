@@ -1,5 +1,6 @@
 local helper = require("obhook.test.helper")
 local obhook = helper.require("obhook")
+local assert = require("assertlib").typed(assert)
 
 describe("obhook.new()", function()
   before_each(helper.before_each)
@@ -25,9 +26,9 @@ describe("obhook.new()", function()
 
     local got = hooked.key
 
-    assert.is_same(before, 1)
-    assert.is_same(after, 2)
-    assert.is_same("value", got)
+    assert.same(before, 1)
+    assert.same(after, 2)
+    assert.same("value", got)
   end)
 
   it("can hook nested index", function()
@@ -53,10 +54,10 @@ describe("obhook.new()", function()
 
     local got = hooked.key1.key2
 
-    assert.is_same(before, 3)
-    assert.is_same(after, 4)
-    assert.is_same("value", got)
-    assert.is_same({ keys = { "hooked", "key1", "key2" } }, used_ctx)
+    assert.same(before, 3)
+    assert.same(after, 4)
+    assert.same("value", got)
+    assert.same({ keys = { "hooked", "key1", "key2" } }, used_ctx)
   end)
 
   it("can hook newindex simply", function()
@@ -67,7 +68,7 @@ describe("obhook.new()", function()
     local target = { key = "value1" }
     local hooked = obhook.new(target, {
       hooks = {
-        before_newindex = function(ctx)
+        before_newindex = function(_)
           called = called + 1
           before = called
         end,
@@ -80,9 +81,9 @@ describe("obhook.new()", function()
 
     hooked.key = "value2"
 
-    assert.is_same(before, 1)
-    assert.is_same(after, 2)
-    assert.is_same("value2", target.key)
+    assert.same(before, 1)
+    assert.same(after, 2)
+    assert.same("value2", target.key)
   end)
 
   it("can hook newindex in nested index", function()
@@ -106,9 +107,9 @@ describe("obhook.new()", function()
 
     hooked.key1.key2 = "value2"
 
-    assert.is_same(before, 1)
-    assert.is_same(after, 2)
-    assert.is_same("value2", target.key1.key2)
+    assert.same(before, 1)
+    assert.same(after, 2)
+    assert.same("value2", target.key1.key2)
   end)
 
   it("can hook call simply", function()
@@ -134,10 +135,10 @@ describe("obhook.new()", function()
 
     local got1, got2 = hooked("value2")
 
-    assert.is_same(before, 1)
-    assert.is_same(after, 2)
-    assert.is_same("value1", got1)
-    assert.is_same("value2", got2)
+    assert.same(before, 1)
+    assert.same(after, 2)
+    assert.same("value1", got1)
+    assert.same("value2", got2)
   end)
 
   it("can hook call in nested index", function()
@@ -167,9 +168,9 @@ describe("obhook.new()", function()
 
     local got = hooked.key.f()
 
-    assert.is_same(before, 1)
-    assert.is_same(after, 2)
-    assert.is_same("value1", got)
+    assert.same(before, 1)
+    assert.same(after, 2)
+    assert.same("value1", got)
   end)
 end)
 
@@ -191,7 +192,7 @@ describe("obhook.string_newindex()", function()
 
     hooked.key1.key2 = "value2"
 
-    assert.is_same([[hooked["key1"]["key2"] = "value2"]], got)
+    assert.same([[hooked["key1"]["key2"] = "value2"]], got)
   end)
 
   it("can use number as index", function()
@@ -208,7 +209,7 @@ describe("obhook.string_newindex()", function()
 
     hooked[8888] = "value2"
 
-    assert.is_same([[hooked[8888] = "value2"]], got)
+    assert.same([[hooked[8888] = "value2"]], got)
   end)
 end)
 
@@ -230,6 +231,6 @@ describe("obhook.string_call()", function()
 
     hooked.key1.key2(1, "2", { key = 3 })
 
-    assert.is_same([[hooked["key1"]["key2"](1, "2", { key = 3 })]], got)
+    assert.same([[hooked["key1"]["key2"](1, "2", { key = 3 })]], got)
   end)
 end)
