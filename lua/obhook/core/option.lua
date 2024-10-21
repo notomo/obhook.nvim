@@ -15,7 +15,6 @@ local default_opts = {
   parent_key = "obhook_root",
 }
 function M.new(raw_opts)
-  vim.validate({ raw_opts = { raw_opts, "table", true } })
   raw_opts = raw_opts or {}
   return vim.tbl_deep_extend("force", default_opts, raw_opts)
 end
